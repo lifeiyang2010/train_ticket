@@ -29,6 +29,10 @@ API_AUTH_UAMAUTHCLIENT = {
     'url': BASE_URL_OF_12306 + '/otn/uamauthclient'
 }
 
+API_AUTH_INITMy12306Api = {
+    'url': BASE_URL_OF_12306 + '/otn/index/initMy12306Api'
+}
+
 API_USER_INFO = {
     'url': BASE_URL_OF_12306 + '/otn/modifyUser/initQueryUserInfoApi'
 }

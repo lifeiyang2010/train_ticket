@@ -128,6 +128,7 @@ class UserJob:
         data['answer'] = answer
         response = self.session.post(API_BASE_LOGIN.get('url'), data)
         result = response.json()
+        print(result)
         if result.get('result_code') == 0:  # 登录成功
             """
             login 获得 cookie uamtk
@@ -136,6 +137,7 @@ class UserJob:
             """
             new_tk = self.auth_uamtk()
             user_name = self.auth_uamauthclient(new_tk)
+            # self.init_my_12306_api()
             self.update_user_info({'user_name': user_name})
             self.login_did_success()
             return True
@@ -173,8 +175,17 @@ class UserJob:
         result = response.json()
         if result.get('username'):
             return result.get('username')
-        # TODO 处理获取失败情况
+        # # TODO 处理获取失败情况
         return False
+
+    def init_my_12306_api(self):
+        response = self.session.post(API_AUTH_INITMy12306Api.get('url'))
+        result = response.json()
+        print(result)
+        print(result.get('data')['user_name'])
+        # if result.get('data')['user_name']:
+    #         return result.get('data')['user_name']
+    #     return False
 
     def request_device_id(self):
         """
@@ -186,10 +197,10 @@ class UserJob:
             try:
                 result = json.loads(response.text)
                 self.session.cookies.update(result)
-                # self.session.cookies.update({
-                #     'RAIL_EXPIRATION': '',
-                #     'RAIL_DEVICEID': '',
-                # })
+                self.session.cookies.update({
+                    'RAIL_EXPIRATION': '1569235953446',
+                    'RAIL_DEVICEID': 'AZbdkCY6rk-b3J_W98mcINAH-YjQBFH1V3Km1ksO793jzhyDkQS4_u25heGonaHws5pml1x0ZB8L2pmcUct6rztKmJV0FNmDDAJD4Fe4Y_azJhhfS4JNuvBiEO_3tvYRKgicqV75RdzYSClHbZh0AyDo4iD8V5Bf',
+                })
             except:
                 return False
 

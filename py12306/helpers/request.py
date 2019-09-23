@@ -1,5 +1,5 @@
 import requests
-from requests.exceptions import *
+from requests.exceptions import RequestException
 
 from py12306.helpers.func import *
 from requests_html import HTMLSession, HTMLResponse

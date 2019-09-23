@@ -1,7 +1,7 @@
 import math
 import random
-
 from py12306.config import Config
+from py12306.verify.localVerifyCode import verify
 from py12306.helpers.api import API_FREE_CODE_QCR_API
 from py12306.helpers.request import Request
 from py12306.log.common_log import CommonLog
@@ -25,8 +25,10 @@ class OCR:
         :return:
         """
         self = cls()
-        if Config().AUTO_CODE_PLATFORM == 'free':
+        if Config().AUTO_CODE_PLATFORM == 'free_1':
             return self.get_image_by_free_site(img)
+        elif Config().AUTO_CODE_PLATFORM == 'free_2':
+            return self.get_image_by_local_verify(img)
         return self.get_img_position_by_ruokuai(img)
 
     def get_img_position_by_ruokuai(self, img):
@@ -67,6 +69,71 @@ class OCR:
         CommonLog.print_auto_code_fail(CommonLog.MESSAGE_GET_RESPONSE_FROM_FREE_AUTO_CODE)
         return None
 
+    def get_image_by_local_verify(self, img):
+        with open('./tkcode.png', 'rb') as f:
+            result = f.read()
+        result = verify(result)
+        print(result)
+        return self.codexy(Ofset=result, is_raw_input=False)
+
+    def codexy(self, Ofset=None, is_raw_input=True):
+        """
+        获取验证码
+        :return: str
+        """
+        if is_raw_input:
+            print(u"""
+                *****************
+                | 1 | 2 | 3 | 4 |
+                *****************
+                | 5 | 6 | 7 | 8 |
+                *****************
+                """)
+            print(u"验证码分为8个，对应上面数字，例如第一和第二张，输入1, 2  如果开启cdn查询的话，会冲掉提示，直接鼠标点击命令行获取焦点，输入即可，不要输入空格")
+            print(u"如果是linux无图形界面，请使用自动打码，is_auto_code: True")
+            print(u"如果没有弹出验证码，请手动双击根目录下的tkcode.png文件")
+            Ofset = input(u"输入对应的验证码: ")
+        if isinstance(Ofset, list):
+            select = Ofset
+        else:
+            Ofset = Ofset.replace("，", ",")
+            select = Ofset.split(',')
+        post = []
+        offsetsX = 0  # 选择的答案的left值,通过浏览器点击8个小图的中点得到的,这样基本没问题
+        offsetsY = 0  # 选择的答案的top值
+        for ofset in select:
+            if ofset == '1':
+                offsetsY = 77
+                offsetsX = 40
+            elif ofset == '2':
+                offsetsY = 77
+                offsetsX = 112
+            elif ofset == '3':
+                offsetsY = 77
+                offsetsX = 184
+            elif ofset == '4':
+                offsetsY = 77
+                offsetsX = 256
+            elif ofset == '5':
+                offsetsY = 149
+                offsetsX = 40
+            elif ofset == '6':
+                offsetsY = 149
+                offsetsX = 112
+            elif ofset == '7':
+                offsetsY = 149
+                offsetsX = 184
+            elif ofset == '8':
+                offsetsY = 149
+                offsetsX = 256
+            else:
+                pass
+            post.append(offsetsX)
+            post.append(offsetsY)
+        # randCode = str(post).replace(']', '').replace('[', '').replace("'", '').replace(' ', '')
+        print(u"验证码识别坐标为{0}".format(post))
+        # return randCode
+        return post
 
 if __name__ == '__main__':
     pass

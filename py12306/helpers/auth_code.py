@@ -1,6 +1,6 @@
 import random
 import time
-
+import base64
 from requests.exceptions import SSLError
 
 from py12306.config import Config
@@ -36,7 +36,7 @@ class AuthCode:
 
         if not self.check_code(answer):
             return self.retry_get_auth_code()
-        return position
+        return answer
 
     def retry_get_auth_code(self): # TODO 安全次数检测
         CommonLog.add_quick_log(CommonLog.MESSAGE_RETRY_AUTH_CODE.format(self.retry_time)).flush()
@@ -44,15 +44,23 @@ class AuthCode:
         return self.get_auth_code(self.session)
 
     def download_code(self):
+        img_path = './tkcode.png'
         url = API_AUTH_CODE_BASE64_DOWNLOAD.format(random=random.random())
         # code_path = self.data_path + 'code.png'
         try:
             UserLog.add_quick_log(UserLog.MESSAGE_DOWNLAODING_THE_CODE).flush()
             # response = self.session.save_to_file(url, code_path)  # TODO 返回错误情况
             response = self.session.get(url)
-            result = response.json()
-            if result.get('image'):
-                return result.get('image')
+            result = response.json().get('image')
+            if result:
+                try:
+                    with open(img_path, 'wb', encoding="utf-8") as img:
+                        img.write(base64.b64decode(result))
+                        # img.write(result)
+                except Exception:
+                    with open(img_path, 'wb') as img:
+                        img.write(base64.b64decode(result))
+                return result
             raise SSLError('返回数据为空')
         except SSLError as e:
             UserLog.add_quick_log(

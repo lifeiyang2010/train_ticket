@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import sys
 
-from py12306.app import *
+# from py12306.app import *
+from py12306.helpers.func import Const, sleep
+from py12306.config import Config, stay_second
+from py12306.app import App
 from py12306.helpers.cdn import Cdn
 from py12306.log.common_log import CommonLog
 from py12306.query.query import Query
@@ -61,4 +64,5 @@ def load_argvs():
 
 
 if __name__ == '__main__':
+
     main()
